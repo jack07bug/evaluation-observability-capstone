@@ -1,0 +1,4 @@
+Python: Python 3.13.0
+OS: Linux
+Kernel: 6.6.97+
+Architecture: x86_64
