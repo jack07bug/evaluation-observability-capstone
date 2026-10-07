@@ -32,19 +32,22 @@
 record. How many API calls did the system make, and why is retrying a futile case worse than
 escalating it?
 
-> The captured perturbation artifact does not contain the escalation record or API-call count. It does
-> contain `test_ac_01_04_missing_source_halts_immediately PASSED` in
-> `01-policy-pipeline/perturbation-test.txt`. The observed test behavior is that a missing-source case
-> is treated as a halt condition rather than a retry case. An unavailable source cannot be repaired by
-> repeatedly asking the model to extract information that is not present.
+> In `01-policy-pipeline/api-call-count.txt`, the follow-up missing-source run records
+> `result=RetryFutileEscalation` and `api_call_count=1`. The underlying test also sets `endorsements`
+> to null and asserts `client.call_count == 1`. The required information is genuinely absent from the
+> source, so retrying cannot recover it and is less useful than escalating the case.
 
 **1b. Reading the router.** Pick one `human_review` record from your routing output. Which of the
 three signals (confidence, reviewer, integration) sent it to a human? If you had trusted the model's
 confidence alone, what would have happened?
 
-> No `routing_decisions.json` was produced in my run because the live pipeline returned HTTP 401
-> Unauthorized. Therefore I cannot quote a human_review record or identify its triggering signal from
-> my own routing output.
+> Because `pipeline-run.txt` failed with `HTTP 401 Unauthorized`, I used the documented fallback
+> in `01-policy-pipeline/routing-tests.txt`. The line
+> `test_ac_04_06_high_confidence_plus_reviewer_disagreement_still_routes_to_human_review PASSED`
+> shows a human-review route caused by the independent reviewer signal. The corresponding test uses
+> 0.99 extractor confidence, a reviewer disagreement on `premium_amount`, and passing integration
+> checks, yet the decision is `human_review`. Trusting confidence alone could have incorrectly allowed
+> auto-approval despite the reviewer disagreement.
 
 **1c. Where the aggregate lies.** Run the calibration snippet. Quote the one cell whose accuracy lags
 its confidence, plus the overall figure. What does slicing by `policy_type × field` catch that a
@@ -63,7 +66,7 @@ single number hides?
 |---|---|
 | Passing test count | 25 passed |
 | Document run | `02-mortgage-extraction/document-runs.txt` |
-| Classified type | The captured replay output does not print the document type explicitly |
+| Classified type | appraisal |
 
 **2a. Two guarantees.** Paste your discrepancy-run output. Tool use already forces valid JSON, yet the
 validator still catches a bad sum. Why are these two different guarantees? Name one error each

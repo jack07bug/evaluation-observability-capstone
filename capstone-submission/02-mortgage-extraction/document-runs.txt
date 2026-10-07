@@ -1,3 +1,7 @@
+Document: fixtures/documents/appraisal_informal_sqft.txt
+Classified document type: appraisal
+Structured extraction: see JSON output below
+
 {
   "extraction": {
     "borrower": {
